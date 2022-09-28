@@ -21,15 +21,16 @@ class Elicitation:
             if(self.counter >= self.MAX_CMD):
                 print('STOP')
                 return
-            # post.comments.replace_more(limit=None)
-            # comment_queue = post.comments[:]
-            # while comment_queue:
-            #     comment = comment_queue.pop(0)
-            #     self.commentToTuple(comment)
-            #     comment_queue.extend(comment.replies)
-            post.comments.replace_more(limit=None)
-            for comment in post.comments:
+
+            post.comments.replace_more(limit=0)
+            comment_queue = post.comments[:]
+            while comment_queue:
+                comment = comment_queue.pop(0)
                 self.commentToTuple(comment)
+                comment_queue.extend(comment.replies)
+            # post.comments.replace_more(limit=None)
+            # for comment in post.comments:
+            #     self.commentToTuple(comment)
 
     def commentToTuple(self, cmd):
         if(cmd):
