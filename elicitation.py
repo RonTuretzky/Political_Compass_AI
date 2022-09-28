@@ -1,4 +1,4 @@
-#print hello world
+import praw
 class Elicitation:
     def __init__(self):
         self._file = open("controversial.txt", "a")
@@ -7,10 +7,9 @@ class Elicitation:
         self.MAX_CMD = 10000
 
     def run(self):
-        import praw
-        secret = "W2psD3CqQ8h12jzEotTe_SFpQQLWQA"
+        secret = ""
         user_agent = "political_comment_scraper"
-        client_id= "rNjUJWa3Rim3KwuhYlfrSA"
+        client_id= ""
         reddit = praw.Reddit(client_id=client_id, client_secret=secret, user_agent=user_agent)
         ml_subreddit = reddit.subreddit('PoliticalCompassMemes')
         for post in ml_subreddit.controversial(time_filter="all"):
