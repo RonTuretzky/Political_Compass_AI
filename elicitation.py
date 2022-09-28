@@ -21,7 +21,7 @@ class Elicitation:
             if(self.counter >= self.MAX_CMD):
                 print('STOP')
                 return
-            post.comments.replace_more(limit=None)
+            post.comments.replace_more(limit=0)
             comment_queue = post.comments[:]
             while comment_queue:
                 comment = comment_queue.pop(0)
