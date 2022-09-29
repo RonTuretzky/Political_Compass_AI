@@ -1,7 +1,7 @@
 import praw
 class Elicitation:
     def __init__(self):
-        self._file = open("controversial.txt", "a")
+        self._file = open("controversialOnlyMainCMD.txt", "a")
         self._political_opinion = {"Libertarian Right": 0, "Libertarian Left": 0 ,"Authoritarian Left": 0, "Authoritarian Right": 0}
         self.counter = 0
         self.MAX_CMD = 10000
@@ -12,7 +12,7 @@ class Elicitation:
         client_id= ""
         reddit = praw.Reddit(client_id=client_id, client_secret=secret, user_agent=user_agent)
         ml_subreddit = reddit.subreddit('PoliticalCompassMemes')
-        for post in ml_subreddit.controversial(time_filter="all"):
+        for post in ml_subreddit.top(time_filter="all"):
             print(post.title)
             print(self._political_opinion)
             sum_political = sum(self._political_opinion.values())
@@ -25,7 +25,7 @@ class Elicitation:
             while comment_queue:
                 comment = comment_queue.pop(0)
                 self.commentToTuple(comment)
-                comment_queue.extend(comment.replies)
+                # comment_queue.extend(comment.replies)
             # post.comments.replace_more(limit=None)
             # for comment in post.comments:
             #     self.commentToTuple(comment)
