@@ -6,9 +6,9 @@ from ast import literal_eval as make_tuple
 
 def createNewEqualDB():
     file1 = open("controversialOnlyMainCMD.txt", "r")
-    file2 = open("database.txt", "r")
+    # file2 = open("database.txt", "r")
     file3 = open("databaseTop.txt", "r")
-    writeToFile = open("NewDB.txt", "a")
+    writeToFile = open("NewDB.txt", "w")
     c = [2000, 2000, 2000, 2000]
     mapping = {
         "Libertarian Left": 0,
@@ -23,13 +23,13 @@ def createNewEqualDB():
             c[index] -= 1
             writeToFile.write(line)
     print(c)
-    for line in file2:
-        opinion, text = make_tuple(line)
-        index = mapping[opinion]
-        if (c[index] > 0):
-            c[index] -= 1
-            writeToFile.write(line)
-    print(c)
+    # for line in file2:
+    #     opinion, text = make_tuple(line)
+    #     index = mapping[opinion]
+    #     if (c[index] > 0):
+    #         c[index] -= 1
+    #         writeToFile.write(line)
+    # print(c)
     for line in file3:
         opinion, text = make_tuple(line)
         index = mapping[opinion]
@@ -39,9 +39,9 @@ def createNewEqualDB():
     print(c)
 
 def main():
-    # createNewEqualDB()
-    rn = elicitation.Elicitation()
-    rn.run()
+    createNewEqualDB()
+    # rn = elicitation.Elicitation()
+    # rn.run()
 
 
 
