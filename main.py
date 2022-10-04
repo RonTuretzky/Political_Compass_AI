@@ -4,6 +4,39 @@ import elicitation
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 from ast import literal_eval as make_tuple
 
+def merageAllDBToOne():
+    file_1 = open("controversialOnlyMainCMD.txt", "r")
+    file_2 = open("databaseTop.txt", "r")
+    file_3 = open("controversial.txt", "r")
+    file_4 = open("DB", "r")
+    file_5 = open("NewDB.txt", "r")
+    file_6 = open("NewPostDB.txt", "r")
+    newDBFile = open("uniqueDB.txt","a")
+    newDBlst = []
+    files = [file_1,file_2,file_3,file_4,file_5,file_6]
+    for file in files:
+        for line in file:
+            if line not in newDBlst:
+                newDBlst.append(line)
+    for row in newDBlst:
+        newDBFile.write(row)
+    print("DONE")
+
+
+def countEachRole():
+    uniqueDB = open("uniqueDB.txt", "r")
+    unique_role_count = {
+        "Libertarian Left": 0,
+        "Libertarian Right": 0,
+        "Authoritarian Left": 0,
+        "Authoritarian Right": 0,
+    }
+    for line in uniqueDB:
+        opinion, text = make_tuple(line)
+        unique_role_count[opinion] += 1
+    print(unique_role_count)
+
+
 def createNewEqualDB():
     file1 = open("controversialOnlyMainCMD.txt", "r")
     # file2 = open("database.txt", "r")
@@ -39,9 +72,10 @@ def createNewEqualDB():
     print(c)
 
 def main():
-    createNewEqualDB()
-    # rn = elicitation.Elicitation()
-    # rn.run()
+    # countEachRole()
+    # createNewEqualDB()
+    rn = elicitation.Elicitation()
+    rn.run()
 
 
 

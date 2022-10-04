@@ -1,10 +1,10 @@
 import praw
 class Elicitation:
     def __init__(self):
-        self._file = open("controversialOnlyMainCMD.txt", "a")
+        self._file = open("uniqueDB.txt", "a")
         self._political_opinion = {"Libertarian Right": 0, "Libertarian Left": 0 ,"Authoritarian Left": 0, "Authoritarian Right": 0}
         self.counter = 0
-        self.MAX_CMD = 10000
+        self.MAX_CMD = 100000
 
     def run(self):
         secret = ""
@@ -12,7 +12,7 @@ class Elicitation:
         client_id= ""
         reddit = praw.Reddit(client_id=client_id, client_secret=secret, user_agent=user_agent)
         ml_subreddit = reddit.subreddit('PoliticalCompassMemes')
-        for post in ml_subreddit.top(time_filter="all"):
+        for post in ml_subreddit.hot():
             print(post.title)
             print(self._political_opinion)
             sum_political = sum(self._political_opinion.values())
@@ -20,7 +20,7 @@ class Elicitation:
             if(self.counter >= self.MAX_CMD):
                 print('STOP')
                 return
-            post.comments.replace_more(limit=0)
+            post.comments.replace_more(limit=100)
             comment_queue = post.comments[:]
             while comment_queue:
                 comment = comment_queue.pop(0)
@@ -39,8 +39,9 @@ class Elicitation:
                 self._political_opinion[political_opinion] += 1
                 tuple_opinion = ( political_opinion, political_commend)
                 try:
-                    self._file.write(str(tuple_opinion))
-                    self._file.write("\n")
+                    if str(political_opinion) == "Authoritarian Left" and tuple_opinion not in self._file:
+                        self._file.write(str(tuple_opinion))
+                        self._file.write("\n")
                 except:
                     self.counter -= 1
 
