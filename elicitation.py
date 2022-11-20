@@ -7,9 +7,9 @@ class Elicitation:
         self.MAX_CMD = 100000
 
     def run(self):
-        secret = ""
+        secret = "W2psD3CqQ8h12jzEotTe_SFpQQLWQA"
         user_agent = "political_comment_scraper"
-        client_id= ""
+        client_id= "rNjUJWa3Rim3KwuhYlfrSA"
         reddit = praw.Reddit(client_id=client_id, client_secret=secret, user_agent=user_agent)
         ml_subreddit = reddit.subreddit('PoliticalCompassMemes')
         for post in ml_subreddit.hot():
@@ -47,6 +47,7 @@ class Elicitation:
 
 
     def extractPoliticalOpinion(self, text):
+        #TODO add all political types
         if(text):
             if ":libright:" in text:
                 return "Libertarian Right"
