@@ -1,0 +1,4 @@
+Database file: uniqueDB.txt	Epochs:20	LR: 5	Batch Size: 32	init accu_val:0.3139604553624925
+Final accu:	0.46075494307968845
+
+test accuracy    0.796	function:Linear with  weight init	Optimzer:Adamgrad
