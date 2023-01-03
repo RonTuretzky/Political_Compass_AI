@@ -1,10 +1,14 @@
 import praw
+
 class Elicitation:
     def __init__(self):
         self._file = open("uniqueDB.txt", "a")
-        self._political_opinion = {"Libertarian Right": 0, "Libertarian Left": 0 ,"Authoritarian Left": 0, "Authoritarian Right": 0}
+        self._political_opinion = {"Libertarian Right": 0, "Libertarian Left": 0 ,"Authoritarian Left": 0, "Authoritarian Right": 0,
+                                   "Centrist" : 0, "Authoritarian Center" : 0, "Left" : 0, "Right" : 0, "Libertarian Center" : 0}
         self.counter = 0
         self.MAX_CMD = 100000
+
+
 
     def run(self):
         secret = "W2psD3CqQ8h12jzEotTe_SFpQQLWQA"
@@ -39,7 +43,8 @@ class Elicitation:
                 self._political_opinion[political_opinion] += 1
                 tuple_opinion = ( political_opinion, political_commend)
                 try:
-                    if str(political_opinion) == "Authoritarian Left" and tuple_opinion not in self._file:
+                    #if str(political_opinion) == "Authoritarian Left" and tuple_opinion not in self._file:
+                    if not self.CheckDuplicate(tuple_opinion) :
                         self._file.write(str(tuple_opinion))
                         self._file.write("\n")
                 except:
@@ -57,5 +62,32 @@ class Elicitation:
                 return "Authoritarian Left"
             elif ":authright:" in text:
                 return "Authoritarian Right"
+            elif ":centrist:" in text:
+                return "Centrist"
+            elif ":authcenter:" in text:
+                return "Authoritarian Center"
+            elif ":left:" in text:
+                return "Left"
+            elif ":right:" in text:
+                return "Right"
+            elif ":libcenter:" in text:
+                return "Libertarian Center"
             else:
                 return None
+
+
+    def CheckDuplicate(self, tuple_opinion):
+        """
+
+        :param tuple_opinion:
+        :return:
+        check if tuple_opinion already exists if yes return True
+        """
+        try :
+            lines = [ line.split("\n")[0] for line in (self._file).readlines() ]
+            if tuple_opinion in lines :
+                return True
+        except :
+            quit(f"Can't open file {self._file}")
+
+        return False

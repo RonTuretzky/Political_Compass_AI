@@ -30,7 +30,13 @@ def countEachRole():
         "Libertarian Right": 0,
         "Authoritarian Left": 0,
         "Authoritarian Right": 0,
+        "Centrist": 0,
+        "Authoritarian Center": 0,
+        "Left": 0,
+        "Right": 0,
+        "Libertarian Center": 0,
     }
+
     for line in uniqueDB:
         opinion, text = make_tuple(line)
         unique_role_count[opinion] += 1
