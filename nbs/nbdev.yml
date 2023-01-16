@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "Political_Compass_AI"
+  site-url: "https://RonTuretzky.github.io/Political_Compass_AI"
+  description: "AI model which aligns freetext to a political aligenment based on the political-compass model"
+  repo-branch: main
+  repo-url: "https://github.com/RonTuretzky/Political_Compass_AI"
