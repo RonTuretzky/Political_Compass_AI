@@ -1,22 +1,47 @@
 import praw
+import nltk
+from textblob import TextBlob
+
 
 class Elicitation:
     def __init__(self):
-        self._file = open("uniqueDB.txt", "a")
+        self._file = open("uniqueDB.txt", "a",encoding="utf-8")
+        self._fileHot = open("HotPosts.txt", "a",encoding="utf-8")
+        self._fileNew = open("NewPosts.txt", "a",encoding="utf-8")
+        self._fileTop = open("TopPosts.txt", "a",encoding="utf-8")
+
         self._political_opinion = {"Libertarian Right": 0, "Libertarian Left": 0 ,"Authoritarian Left": 0, "Authoritarian Right": 0,
                                    "Centrist" : 0, "Authoritarian Center" : 0, "Left" : 0, "Right" : 0, "Libertarian Center" : 0}
         self.counter = 0
         self.MAX_CMD = 100000
+        self.DataHot = set()
+        self.DataNew = set()
+        self.DataTop = set()
 
 
 
-    def run(self):
+    def run(self , sort ):
         secret = "W2psD3CqQ8h12jzEotTe_SFpQQLWQA"
         user_agent = "political_comment_scraper"
         client_id= "rNjUJWa3Rim3KwuhYlfrSA"
         reddit = praw.Reddit(client_id=client_id, client_secret=secret, user_agent=user_agent)
         ml_subreddit = reddit.subreddit('PoliticalCompassMemes')
-        for post in ml_subreddit.hot():
+
+        if sort == "hot" :
+            posts = ml_subreddit.hot()
+            self.Create_DataBase(self.DataHot , self._fileHot ,posts )
+        elif sort == "new" :
+            posts = ml_subreddit.new()
+            self.Create_DataBase(self.DataNew , self._fileNew ,posts )
+        elif sort == "top":
+            posts = ml_subreddit.top()
+            self.Create_DataBase(self.DataTop , self._fileTop ,posts )
+
+
+
+    def Create_DataBase(self, Data , File , Posts):
+
+        for post in Posts:
             print(post.title)
             print(self._political_opinion)
             sum_political = sum(self._political_opinion.values())
@@ -28,11 +53,20 @@ class Elicitation:
             comment_queue = post.comments[:]
             while comment_queue:
                 comment = comment_queue.pop(0)
-                self.commentToTuple(comment)
+                tuple_opinion = self.commentToTuple(comment)
+                if (tuple_opinion != -1) : # if we don't have problems
+                    Data.add(tuple_opinion)
                 # comment_queue.extend(comment.replies)
             # post.comments.replace_more(limit=None)
             # for comment in post.comments:
             #     self.commentToTuple(comment)
+
+            # after we get all the opinions we want to write this to the file (data base)
+            all_opinions = [str(i) for i in Data]
+            for i in range(len(all_opinions)) :
+                #print(f"all_opinions[{i}] ::\n", all_opinions[i])
+                (File).write(all_opinions[i]+"\n")
+
 
     def commentToTuple(self, cmd):
         if(cmd):
@@ -41,7 +75,12 @@ class Elicitation:
             if(political_opinion):
                 self.counter += 1
                 self._political_opinion[political_opinion] += 1
-                tuple_opinion = ( political_opinion, political_commend)
+                grammerScore = self.grammar_score(political_commend)
+                tuple_opinion = ( political_opinion, political_commend, len(political_commend),grammerScore)
+                print(tuple_opinion)
+                exit()
+                return  tuple_opinion
+                """
                 try:
                     #if str(political_opinion) == "Authoritarian Left" and tuple_opinion not in self._file:
                     if not self.CheckDuplicate(tuple_opinion) :
@@ -49,7 +88,36 @@ class Elicitation:
                         self._file.write("\n")
                 except:
                     self.counter -= 1
+                """
 
+
+        return -1
+
+
+
+    def text_to_sentences(self,__text):
+        import re
+        return re.split("[\.\?\!]", __text)
+
+
+    def cal_grammar_score(self,text):
+        import language_tool_python
+        tool = language_tool_python.LanguageTool('en-US')
+        count_errors = 0
+        processed = self.text_to_sentences(text)
+        for sentence in processed:
+            matches = tool.check(sentence)
+            count_errors += len(matches)
+        return count_errors
+
+    def sentiment(self ,sentence):
+        """
+
+        :param sentence:
+        :return: if a sentence is good or bad
+        """
+        blob = TextBlob(sentence)
+        return abs(blob.sentiment.polarity)
 
     def extractPoliticalOpinion(self, text):
         #TODO add all political types
@@ -59,6 +127,7 @@ class Elicitation:
             elif ":libleft:" in text:
                 return "Libertarian Left"
             elif ":authleft:" in text:
+                
                 return "Authoritarian Left"
             elif ":authright:" in text:
                 return "Authoritarian Right"
@@ -78,7 +147,6 @@ class Elicitation:
 
     def CheckDuplicate(self, tuple_opinion):
         """
-
         :param tuple_opinion:
         :return:
         check if tuple_opinion already exists if yes return True
@@ -91,3 +159,4 @@ class Elicitation:
             quit(f"Can't open file {self._file}")
 
         return False
+
