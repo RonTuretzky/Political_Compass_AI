@@ -90,9 +90,7 @@ class Elicitation:
                     self.counter -= 1
                 """
 
-
         return -1
-
 
 
     def text_to_sentences(self,__text):
@@ -112,12 +110,13 @@ class Elicitation:
 
     def sentiment(self ,sentence):
         """
-
         :param sentence:
         :return: if a sentence is good or bad
+        minus - bad sentence
+        plus - good sentence
         """
         blob = TextBlob(sentence)
-        return abs(blob.sentiment.polarity)
+        return blob.sentiment.polarity
 
     def extractPoliticalOpinion(self, text):
         #TODO add all political types
