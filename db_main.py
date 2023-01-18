@@ -74,8 +74,15 @@ def createNewEqualDB():
 def main():
     # countEachRole()
     # createNewEqualDB()
-    rn = elicitation.Elicitation()
-    rn.run()
+    rn_Hot = elicitation.Elicitation()
+    rn_Hot.run("hot")
+
+    rn_New = elicitation.Elicitation()
+    rn_New.run("new")
+
+    rn_Top = elicitation.Elicitation()
+    rn_Top.run("top")
+
 
 
 
