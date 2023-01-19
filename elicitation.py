@@ -75,8 +75,11 @@ class Elicitation:
             if(political_opinion):
                 self.counter += 1
                 self._political_opinion[political_opinion] += 1
-                grammerScore = self.grammar_score(political_commend)
-                tuple_opinion = ( political_opinion, political_commend, len(political_commend),grammerScore)
+		try:
+                	grammerScore = self.grammar_score(political_commend)
+                except exception as E:
+			grammerScore = str(e)
+		tuple_opinion = ( political_opinion, political_commend, len(political_commend),grammerScore)
                 print(tuple_opinion)
                 exit()
                 return  tuple_opinion
