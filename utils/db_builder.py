@@ -13,7 +13,7 @@ class DB_Builder:
         self._political_opinion = {"Libertarian Right": 0, "Libertarian Left": 0 ,"Authoritarian Left": 0, "Authoritarian Right": 0,
                                    "Centrist" : 0, "Authoritarian Center" : 0, "Left" : 0, "Right" : 0, "Libertarian Center" : 0}
         self.counter = 0
-        self.MAX_CMD = 33,333
+        self.MAX_CMD = 33333
         self.DataHot = set()
         self.DataNew = set()
         self.DataTop = set()
