@@ -46,16 +46,18 @@ class DB_Builder:
             print(self._political_opinion)
             sum_political = sum(self._political_opinion.values())
             print(sum_political)
-            if(self.counter >= self.MAX_CMD):
-                print('STOP')
-                return
             post.comments.replace_more(limit=100)
             comment_queue = post.comments[:]
             while comment_queue:
                 comment = comment_queue.pop(0)
                 tuple_opinion = self.commentToTuple(comment)
                 if (tuple_opinion != -1) : # if we don't have problems
-                    Data.add(tuple_opinion)
+                    File.write(str(tuple_opinion) + "\n")
+                    # Data.add(tuple_opinion)
+                if(self.counter >= self.MAX_CMD):
+                    print('STOP')
+                    return
+                        # self.Set_To_File()
                 # comment_queue.extend(comment.replies)
             # post.comments.replace_more(limit=None)
             # for comment in post.comments:
@@ -89,7 +91,7 @@ class DB_Builder:
                     # tuple_opinion = ( political_opinion, political_comment, len(political_comment),grammerScore,Sentiment)
                     tuple_opinion = ( political_opinion, political_comment)
                     print(tuple_opinion)
-                    return  tuple_opinion
+                    return tuple_opinion
 
                 except Exception as e:
                     return e
