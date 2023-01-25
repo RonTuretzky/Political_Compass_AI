@@ -62,10 +62,18 @@ class Elicitation:
             #     self.commentToTuple(comment)
 
             # after we get all the opinions we want to write this to the file (data base)
-            all_opinions = [str(i) for i in Data]
-            for i in range(len(all_opinions)) :
-                #print(f"all_opinions[{i}] ::\n", all_opinions[i])
-                (File).write(all_opinions[i]+"\n")
+            print(f"{Data} : {len (Data)}")
+
+    def Set_To_File(self):
+        # make a set wich contains all the data from Hot/New/Top
+        uniqe =( (self.DataHot).union(self.DataNew)  ).union(self.DataTop)
+        all_opinions = [str(i) for i in uniqe]
+        # write all tje ploitical opinions to file
+        for i in range(len(all_opinions)):
+            # print(f"all_opinions[{i}] ::\n", all_opinions[i])
+            (self._file).write(all_opinions[i] + "\n")
+
+
 
 
     def commentToTuple(self, cmd):
@@ -75,14 +83,17 @@ class Elicitation:
             if(political_opinion):
                 self.counter += 1
                 self._political_opinion[political_opinion] += 1
-		try:
-                	grammerScore = self.grammar_score(political_commend)
-                except exception as E:
-			grammerScore = str(e)
-		tuple_opinion = ( political_opinion, political_commend, len(political_commend),grammerScore)
-                print(tuple_opinion)
-                exit()
-                return  tuple_opinion
+                try :
+                    grammerScore = self.cal_grammar_score(political_commend)
+                    Sentiment = self.sentiment(political_commend)
+                    tuple_opinion = ( political_opinion, political_commend, len(political_commend),grammerScore,Sentiment)
+                    print(tuple_opinion)
+                    return  tuple_opinion
+
+                except Exception as E :
+                    return E
+
+
                 """
                 try:
                     #if str(political_opinion) == "Authoritarian Left" and tuple_opinion not in self._file:
