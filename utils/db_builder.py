@@ -3,9 +3,9 @@ import nltk
 from textblob import TextBlob
 
 
-class Elicitation:
+class DB_Builder:
     def __init__(self):
-        self._file = open("uniqueDB.txt", "a",encoding="utf-8")
+        self._file = open("../uniqueDB.txt", "a", encoding="utf-8")
         self._fileHot = open("HotPosts.txt", "a",encoding="utf-8")
         self._fileNew = open("NewPosts.txt", "a",encoding="utf-8")
         self._fileTop = open("TopPosts.txt", "a",encoding="utf-8")
@@ -78,31 +78,20 @@ class Elicitation:
 
     def commentToTuple(self, cmd):
         if(cmd):
-            political_commend = cmd.body
+            political_comment = cmd.body
             political_opinion = self.extractPoliticalOpinion(cmd.author_flair_text)
             if(political_opinion):
                 self.counter += 1
                 self._political_opinion[political_opinion] += 1
                 try :
-                    grammerScore = self.cal_grammar_score(political_commend)
-                    Sentiment = self.sentiment(political_commend)
-                    tuple_opinion = ( political_opinion, political_commend, len(political_commend),grammerScore,Sentiment)
+                    grammerScore = self.cal_grammar_score(political_comment)
+                    Sentiment = self.sentiment(political_comment)
+                    tuple_opinion = ( political_opinion, political_comment, len(political_comment),grammerScore,Sentiment)
                     print(tuple_opinion)
                     return  tuple_opinion
 
-                except Exception as E :
-                    return E
-
-
-                """
-                try:
-                    #if str(political_opinion) == "Authoritarian Left" and tuple_opinion not in self._file:
-                    if not self.CheckDuplicate(tuple_opinion) :
-                        self._file.write(str(tuple_opinion))
-                        self._file.write("\n")
-                except:
-                    self.counter -= 1
-                """
+                except Exception as e:
+                    return e
 
         return -1
 
@@ -118,10 +107,12 @@ class Elicitation:
         count_errors = 0
         processed = self.text_to_sentences(text)
         for sentence in processed:
-            matches = tool.check(sentence)
-            count_errors += len(matches)
-        return count_errors
-
+            try:
+                matches = tool.check(sentence)
+                count_errors += len(matches)
+                return count_errors
+            except Exception as e:
+                return e
     def sentiment(self ,sentence):
         """
         :param sentence:
