@@ -86,7 +86,8 @@ class DB_Builder:
                 try :
                     grammerScore = self.cal_grammar_score(political_comment)
                     Sentiment = self.sentiment(political_comment)
-                    tuple_opinion = ( political_opinion, political_comment, len(political_comment),grammerScore,Sentiment)
+                    # tuple_opinion = ( political_opinion, political_comment, len(political_comment),grammerScore,Sentiment)
+                    tuple_opinion = ( political_opinion, political_comment)
                     print(tuple_opinion)
                     return  tuple_opinion
 
