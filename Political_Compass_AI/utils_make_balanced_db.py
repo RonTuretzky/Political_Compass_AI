@@ -5,6 +5,8 @@ __all__ = ['make_balanced_db']
 
 # %% ../nbs/Db_Utils/make_balanced_db.ipynb 0
 from fastcore.script import call_parse
+from ast import literal_eval as make_tuple
+
 @call_parse()
 def make_balanced_db(
         db_path:str # Path to db to balance

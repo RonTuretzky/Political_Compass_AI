@@ -10,7 +10,6 @@ import torch
 from typing import Any
 
 
-@call_parse
 def train(
         dataloader:Any #
         ,model:Any # Model
