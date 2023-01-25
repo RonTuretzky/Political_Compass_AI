@@ -37,11 +37,11 @@ def return_iters(db:str # Path to db
 from torchtext.data.utils import get_tokenizer
 # from Political_Compass_AI.data_processing import return_iters
 # from Political_Compass_AI.data_processing import split_string
-from .data_processing import yield_tokens
-from .data_processing import collate_batch
-from .model import TextClassificationModel
-from .training import train
-from .training import evaluate
+from data_processing import yield_tokens
+from data_processing import collate_batch
+from model import TextClassificationModel
+from training import train
+from training import evaluate
 from torchtext.data.functional import to_map_style_dataset
 from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader
