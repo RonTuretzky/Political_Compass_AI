@@ -22,6 +22,11 @@ def return_iters(db:str # Path to db
         "Libertarian Right": 2,
         "Authoritarian Left": 3,
         "Authoritarian Right": 4,
+        "Centrist": 5,
+        "Authoritarian Center": 6,
+        "Left": 7,
+        "Right": 8,
+        "Libertarian Center": 9,
     }
     lines = file.readlines()
     for line in lines:
@@ -37,11 +42,11 @@ def return_iters(db:str # Path to db
 from torchtext.data.utils import get_tokenizer
 # from Political_Compass_AI.data_processing import return_iters
 # from Political_Compass_AI.data_processing import split_string
-from data_processing import yield_tokens
-from data_processing import collate_batch
-from model import TextClassificationModel
-from training import train
-from training import evaluate
+from .data_processing import yield_tokens
+from .data_processing import collate_batch
+from .model import TextClassificationModel
+from .training import train
+from .training import evaluate
 from torchtext.data.functional import to_map_style_dataset
 from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader
@@ -67,7 +72,6 @@ def collate_batch(
     text_list = torch.cat(text_list)
     return label_list.to(device), text_list.to(device), offsets.to(device)
 
-@call_parse
 def run(
     _db:str # dn path to run alignment distribution
 
@@ -84,9 +88,13 @@ def run(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
     train_iter, test_iter = return_iters(db)
+    print("derp")
+    quit(1)
     dataloader = DataLoader(train_iter, batch_size=8, shuffle=False, collate_fn=collate_batch)
     train_iter, test_iter = return_iters(db)
-    num_class = len(set([label for (label, text) in train_iter]))
+    _num_class = len(set([label for (label, text) in train_iter]))
+    print(_num_class)
+    num_class = 9
     vocab_size = len(vocab)
     emsize = 128
     LR = 5
