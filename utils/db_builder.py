@@ -13,7 +13,7 @@ class DB_Builder:
         self._political_opinion = {"Libertarian Right": 0, "Libertarian Left": 0 ,"Authoritarian Left": 0, "Authoritarian Right": 0,
                                    "Centrist" : 0, "Authoritarian Center" : 0, "Left" : 0, "Right" : 0, "Libertarian Center" : 0}
         self.counter = 0
-        self.MAX_CMD = 33333
+        self.MAX_CMD = 50000
         self.DataHot = set()
         self.DataNew = set()
         self.DataTop = set()
@@ -21,51 +21,47 @@ class DB_Builder:
 
 
     def run(self , sort ):
+        self.Create_DataBase(self.DataHot , self._fileHot ,sort )
+
+
+
+    def Create_DataBase(self, Data , File , sort):
         secret = "W2psD3CqQ8h12jzEotTe_SFpQQLWQA"
         user_agent = "political_comment_scraper"
         client_id= "rNjUJWa3Rim3KwuhYlfrSA"
         reddit = praw.Reddit(client_id=client_id, client_secret=secret, user_agent=user_agent)
         ml_subreddit = reddit.subreddit('PoliticalCompassMemes')
+        while True:
+            if sort == "hot" :
+                posts = ml_subreddit.hot(limit=None)
+            elif sort == "new" :
+                posts = ml_subreddit.new(limit=None)
+            elif sort == "top":
+                posts = ml_subreddit.top(limit=None, time_filter="all")
+            _posts = posts
+            for post in _posts:
+                print(post.title)
+                print(self._political_opinion)
+                sum_political = sum(self._political_opinion.values())
+                print(sum_political)
+                post.comments.replace_more(limit=None)
+                for comment in post.comments.list():
+                    tuple_opinion = self.commentToTuple(comment)
+                    if (tuple_opinion != -1) : # if we don't have problems
 
-        if sort == "hot" :
-            posts = ml_subreddit.hot()
-            self.Create_DataBase(self.DataHot , self._fileHot ,posts )
-        elif sort == "new" :
-            posts = ml_subreddit.new()
-            self.Create_DataBase(self.DataNew , self._fileNew ,posts )
-        elif sort == "top":
-            posts = ml_subreddit.top()
-            self.Create_DataBase(self.DataTop , self._fileTop ,posts )
+                        File.write(str(tuple_opinion) + "\n")
+                        # Data.add(tuple_opinion)
+                    if(self.counter >= self.MAX_CMD):
+                        print('STOP')
+                        return
+                            # self.Set_To_File()
+                    # comment_queue.extend(comment.replies)
+                # post.comments.replace_more(limit=None)
+                # for comment in post.comments:
+                #     self.commentToTuple(comment)
 
-
-
-    def Create_DataBase(self, Data , File , Posts):
-
-        for post in Posts:
-            print(post.title)
-            print(self._political_opinion)
-            sum_political = sum(self._political_opinion.values())
-            print(sum_political)
-            post.comments.replace_more(limit=100)
-            comment_queue = post.comments[:]
-            while comment_queue:
-                comment = comment_queue.pop(0)
-                tuple_opinion = self.commentToTuple(comment)
-                if (tuple_opinion != -1) : # if we don't have problems
-                    File.write(str(tuple_opinion) + "\n")
-                    # Data.add(tuple_opinion)
-                if(self.counter >= self.MAX_CMD):
-                    print('STOP')
-                    return
-                        # self.Set_To_File()
-                # comment_queue.extend(comment.replies)
-            # post.comments.replace_more(limit=None)
-            # for comment in post.comments:
-            #     self.commentToTuple(comment)
-
-            # after we get all the opinions we want to write this to the file (data base)
-            print(f"{Data} : {len (Data)}")
-
+                # after we get all the opinions we want to write this to the file (data base)
+                print(f"{Data} : {len (Data)}")
     def Set_To_File(self):
         # make a set wich contains all the data from Hot/New/Top
         uniqe =( (self.DataHot).union(self.DataNew)  ).union(self.DataTop)
@@ -166,4 +162,7 @@ class DB_Builder:
             quit(f"Can't open file {self._file}")
 
         return False
-
+def main():
+    a = DB_Builder
+    a.run(a,"hot")
+main()
