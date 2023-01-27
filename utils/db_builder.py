@@ -136,13 +136,13 @@ class DB_Builder:
                 return "Authoritarian Right"
             elif ":centrist:" in text:
                 return "Centrist"
-            elif ":authcenter:" in text:
+            elif ":auth:" in text:
                 return "Authoritarian Center"
             elif ":left:" in text:
                 return "Left"
             elif ":right:" in text:
                 return "Right"
-            elif ":libcenter:" in text:
+            elif ":lib:" in text:
                 return "Libertarian Center"
             else:
                 return None
