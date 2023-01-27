@@ -42,17 +42,18 @@ def return_iters(db:str # Path to db
 from torchtext.data.utils import get_tokenizer
 # from Political_Compass_AI.data_processing import return_iters
 # from Political_Compass_AI.data_processing import split_string
-from .data_processing import yield_tokens
-from .data_processing import collate_batch
-from .model import TextClassificationModel
-from .training import train
-from .training import evaluate
+from data_processing import yield_tokens
+from data_processing import collate_batch
+from model import TextClassificationModel
+from training import train
+from training import evaluate
 from torchtext.data.functional import to_map_style_dataset
 from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import random_split
 import time
 import torch
+import pandas as pd
 
 def collate_batch(
         batch
@@ -71,9 +72,15 @@ def collate_batch(
     offsets = torch.tensor(offsets[:-1]).cumsum(dim=0)
     text_list = torch.cat(text_list)
     return label_list.to(device), text_list.to(device), offsets.to(device)
-
+@call_parse
 def run(
     _db:str # dn path to run alignment distribution
+    ,emsize = 128
+    ,LR = 5
+    ,BATCH_SIZE = 32
+    ,optimizer = "Adagrad"
+    ,EPOCHS = 20
+
 
 ):
     global text_pipeline
@@ -88,28 +95,23 @@ def run(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
     train_iter, test_iter = return_iters(db)
-    print("derp")
-    quit(1)
     dataloader = DataLoader(train_iter, batch_size=8, shuffle=False, collate_fn=collate_batch)
     train_iter, test_iter = return_iters(db)
-    _num_class = len(set([label for (label, text) in train_iter]))
-    print(_num_class)
-    num_class = 9
+    num_class = len(set([label for (label, text) in train_iter]))
     vocab_size = len(vocab)
-    emsize = 128
-    LR = 5
     model = TextClassificationModel(vocab_size, emsize, num_class).to(device)
-    BATCH_SIZE = 32
     run_ledger = open("Run_Ledger.txt", 'a')
     criterion = torch.nn.CrossEntropyLoss()
-    # optimizer = torch.optim.SGD(model.parameters(), lr=LR)
-    optimizer = torch.optim.Adagrad(model.parameters(), lr=LR)
+    _optimizer=optimizer
+    if optimizer=="Adagrad":
+        optimizer = torch.optim.Adagrad(model.parameters(), lr=LR)
+    elif optimizer=="SGD":
+        optimizer = torch.optim.SGD(model.parameters(), lr=LR)
+    else:
+        print("Choose a different optimizer")
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.1)
-    function = "Linear with  weight init"
-    _optim = "Adamgrad"
     total_accu = None
     train_iter, test_iter = return_iters(db)
-
     train_dataset = to_map_style_dataset(train_iter)
     test_dataset = to_map_style_dataset(test_iter)
     num_train = int(len(train_dataset) * 0.95)
@@ -123,8 +125,6 @@ def run(
     test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,
                                  shuffle=True, collate_fn=collate_batch)
     first_flag = True
-    EPOCHS = 20
-
     for epoch in range(1, EPOCHS + 1):
         epoch_start_time = time.time()
         train(train_dataloader, model, optimizer, epoch)
@@ -133,19 +133,28 @@ def run(
             scheduler.step()
         else:
             total_accu = accu_val
-        if first_flag:
-            run_ledger.write("Database file: " + db + "\t" + "Epochs:" + str(EPOCHS) + "\t" + "LR: " + str(
-                LR) + "\t" + "Batch Size: " + str(BATCH_SIZE) + "\tinit accu_val:" + str(accu_val) + "\n")
-            first_flag = False
+
         print('-' * 59)
         print('| end of epoch {:3d} | time: {:5.2f}s | '
               'valid accuracy {:8.3f} '.format(epoch,
                                                time.time() - epoch_start_time,
                                                accu_val))
         print('-' * 59)
-    run_ledger.write("Final accu:\t" + str(accu_val) + "\n\n")
+
     accu_test = evaluate(test_dataloader,model)
-    out = 'test accuracy {:8.3f}'.format(accu_test)
-    print(out)
-    run_ledger.write(out + "\tfunction:" + function + "\tOptimzer:" + _optim + '\n')
-    run_ledger.close()
+
+    df_Log = {"Database_file":[],"Epochs":[],"LR":[],"Batch_Size":[],
+              "Final_accu":[],"Optimzer":[],"accu_test":[]}
+
+    df_Log["Database_file"].append(db)
+    df_Log["Epochs"].append(str(EPOCHS))
+    df_Log["LR"].append( str(LR))
+    df_Log["Batch_Size"].append(str(BATCH_SIZE))
+    df_Log["Final_accu"].append(str(accu_val))
+    df_Log["Optimzer"].append(_optimizer)
+    df_Log["accu_test"].append(accu_test)
+
+    dataframe = pd.DataFrame(df_Log)
+    dataframe.to_csv('Run_Ledger.csv',mode='a', index=False,sep="\t")
+    print(str(accu_test))
+    return model
