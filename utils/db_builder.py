@@ -162,7 +162,3 @@ class DB_Builder:
             quit(f"Can't open file {self._file}")
 
         return False
-def main():
-    a = DB_Builder
-    a.run(a,"hot")
-main()
