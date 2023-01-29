@@ -16,10 +16,12 @@ def parse_for_dupes(
     with open(db_path1, "r") as file1:
     # Read the lines in the first file into a set
         file1_lines = set(file1.readlines())
+        print(len(file1_lines))
 
 # Open the second file
     with open(db_path2, "r") as file2:
         # Read the lines in the second file into a set
         file2_lines = set(file2.readlines())
+        print(len(file2_lines))
     duplicate_lines = file1_lines.intersection(file2_lines)
-    print(duplicate_lines)
+    print(len(duplicate_lines))
