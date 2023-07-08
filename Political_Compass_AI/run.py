@@ -5,9 +5,6 @@ __all__ = ['split_string', 'return_iters', 'define_model', 'collate_batch', 'obj
 
 # %% ../nbs/run.ipynb 0
 from fastcore.script import call_parse
-
-
-
 def split_string(string):
     # Removing the parentheses and splitting the string by comma
     parts = string[1:-1].split(",")
@@ -25,6 +22,11 @@ def return_iters(db:str # Path to db
         "Libertarian Right": 2,
         "Authoritarian Left": 3,
         "Authoritarian Right": 4,
+        "Centrist": 5,
+        "Authoritarian Center": 6,
+        "Left": 7,
+        "Right": 8,
+        "Libertarian Center": 9,
     }
     lines = file.readlines()
     for line in lines:
@@ -40,11 +42,11 @@ def return_iters(db:str # Path to db
 from torchtext.data.utils import get_tokenizer
 # from Political_Compass_AI.data_processing import return_iters
 # from Political_Compass_AI.data_processing import split_string
-from data_processing import yield_tokens
-from data_processing import collate_batch
-from training import train
-from training import evaluate
-from model import TextClassificationModel
+from .data_processing import yield_tokens
+from .data_processing import collate_batch
+from .model import TextClassificationModel
+from .training import train
+from .training import evaluate
 from torchtext.data.functional import to_map_style_dataset
 from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader
@@ -57,8 +59,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data
-from torchvision import datasets
-from torchvision import transforms
+# from torchvision import datasets
+# from torchvision import transforms
 import pandas as pd
 def define_model(trial,vocab_size, emsize, num_class):
     model = TextClassificationModel(vocab_size, emsize, num_class)
@@ -81,15 +83,15 @@ def collate_batch(
     text_list = torch.cat(text_list)
     return label_list.to(device), text_list.to(device), offsets.to(device)
 
-@call_parse
 def objective(
     trial,
 
 ):
     global text_pipeline
     global db
-    BATCH_SIZE = trial.suggest_int('n_epochs', 8, 64)
-    db="../uniqueDB.txt"
+    # BATCH_SIZE = trial.suggest_int('n_epochs', 8, 64)
+    BATCH_SIZE = trial.suggest_int('n_batch_size',32,128,32)
+    db="../194511_DB_Hot_Top_New"
     tokenizer = get_tokenizer('basic_english')
     text_pipeline = lambda x: vocab(tokenizer(x))
     label_pipeline = lambda x: int(x) - 1
@@ -102,22 +104,18 @@ def objective(
     train_iter, test_iter = return_iters(db)
     num_class = len(set([label for (label, text) in train_iter]))
     vocab_size = len(vocab)
-    emsize = 128
-    LR = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
+    emsize = trial.suggest_int("em_size",64,128,32)
+    LR = trial.suggest_float("lr", 1e-5, 1e-3, log=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = define_model(trial,vocab_size, emsize, num_class).to(device)
     run_ledger = open("Run_Ledger.txt", 'a')
     criterion = torch.nn.CrossEntropyLoss()
-    # optimizer = torch.optim.SGD(model.parameters(), lr=LR)
-    # optimizer = torch.optim.Adagrad(model.parameters(), lr=LR)
     optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD","Adagrad"])
     optimizer = getattr(optim, optimizer_name)(model.parameters(), lr=LR)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.1)
-    function = "Linear with  weight init"
-    _optim = "Adamgrad"
+    _optim = optimizer_name
     total_accu = None
     train_iter, test_iter = return_iters(db)
-
     train_dataset = to_map_style_dataset(train_iter)
     test_dataset = to_map_style_dataset(test_iter)
     num_train = int(len(train_dataset) * 0.95)
@@ -130,10 +128,8 @@ def objective(
                                   shuffle=True, collate_fn=collate_batch)
     test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,
                                  shuffle=True, collate_fn=collate_batch)
-    first_flag = True
-    EPOCHS = trial.suggest_int('n_epochs', 20, 50)
-
-
+    # EPOCHS = trial.suggest_int('n_epochs', 20, 40)
+    EPOCHS = 20
     for epoch in range(1, EPOCHS + 1):
         epoch_start_time = time.time()
         train(train_dataloader, model, optimizer, epoch)
@@ -151,18 +147,18 @@ def objective(
         trial.report(accu_val, epoch)
         if trial.should_prune():
             raise optuna.exceptions.TrialPruned()
-        return accu_val
-    # df_Log = {"Database_file":[],"Epochs":[],"LR":[],"Batch_Size":[],
-    #           "Final_accu":[],"Optimzer":[],"accu_test":[]}
-    #
-    # accu_test = evaluate(test_dataloader,model)
-    # out = 'test accuracy {:8.3f}'.format(accu_test)
-    # df_Log["Database_file"].append(db)
-    # df_Log["Epochs"].append(str(EPOCHS))
-    # df_Log["LR"].append( str(LR))
-    # df_Log["Batch_Size"].append(str(BATCH_SIZE))
-    # df_Log["Final_accu"].append(str(accu_val))
-    # df_Log["Optimzer"].append(optimizer_name)
-    # df_Log["accu_test"].append(accu_test)
-    # dataframe = pd.DataFrame(df_Log)
-    # dataframe.to_csv('Run_Ledger.csv',mode='a', index=False,sep="\t")
+    df_Log = {"Database_file":[],"Epochs":[],"LR":[],"Batch_Size":[],
+              "Final_accu":[],"Optimzer":[],"accu_test":[]}
+    accu_test = evaluate(test_dataloader,model)
+    out = 'test accuracy {:8.3f}'.format(accu_test)
+    df_Log["Database_file"].append(db)
+    df_Log["Epochs"].append(str(EPOCHS))
+    df_Log["LR"].append( str(LR))
+    df_Log["Batch_Size"].append(str(BATCH_SIZE))
+    df_Log["Final_accu"].append(str(accu_val))
+    df_Log["Optimzer"].append(optimizer_name)
+    df_Log["accu_test"].append(accu_test)
+    dataframe = pd.DataFrame(df_Log)
+    dataframe.to_csv('Run_Ledger.csv',mode='a', index=False,sep="\t")
+    return accu_val
+
