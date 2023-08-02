@@ -16,7 +16,7 @@ subprocess.run(["huggingface-cli", "login", "--token", token])
 
 # %% ../nbs/hf/hf.ipynb 3
 from datasets import load_dataset
-dataset = load_dataset("csv",data_files={'test':["test.csv"],'train':['train.csv']},encoding='latin1')
+dataset = load_dataset("csv",data_files={'test':["_test.csv"],'train':['_train.csv']},encoding='latin1')
 
 # %% ../nbs/hf/hf.ipynb 4
 label2id = {
