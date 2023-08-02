@@ -150,3 +150,6 @@ import torch
 print(torch.cuda.is_available())
 trainer.train()
 trainer.push_to_hub()
+file = open("pcm_model_eval.txt", "w")
+file.write(str(trainer.evaluate(eval_dataset=tokenized_dataset["test"])))
+file.close()
