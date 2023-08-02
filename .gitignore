@@ -150,5 +150,4 @@ checklink/cookies.txt
 # Quarto
 .quarto
 
-*Run_Ledger.txt
-*Run_Ledger.csv
+/Political_Compass_AI/*
