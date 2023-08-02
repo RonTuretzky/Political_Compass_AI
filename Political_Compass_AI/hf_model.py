@@ -122,6 +122,7 @@ training_args = TrainingArguments(
     logging_steps=tracing_steps, # to get more information to TB
     eval_steps=tracing_steps,
     save_steps=tracing_steps,
+auto_find_batch_size =True,
 )
 trainer = Trainer(
     model=model,
