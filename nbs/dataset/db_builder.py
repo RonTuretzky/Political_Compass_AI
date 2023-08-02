@@ -20,8 +20,10 @@ class DB_Builder:
 
 
 
-    def run(self , sort ):
-        self.Create_DataBase(self.DataHot , self._fileHot ,sort )
+    def run(self ):
+        self.Create_DataBase(self.DataHot , self._fileHot ,'hot' )
+        self.Create_DataBase(self.DataHot , self._fileNew ,'new' )
+        self.Create_DataBase(self.DataHot , self._fileTop ,'top' )
 
 
 
@@ -162,3 +164,7 @@ class DB_Builder:
             quit(f"Can't open file {self._file}")
 
         return False
+def main():
+    db_b = DB_Builder()
+    db_b.run()
+main()
