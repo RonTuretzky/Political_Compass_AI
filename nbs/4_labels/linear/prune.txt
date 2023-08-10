@@ -1,0 +1,11 @@
+Study statistics: 
+
+  Number of finished trials:1000
+  Number of pruned trials: 980
+  Number of complete trials: 20Best trial:
+  Value: 0.4733373277411624
+  Params: 
+    n_epochs: 43
+    em_size: 64
+    lr: 1.199365085648013
+    optimizer: Adagrad
