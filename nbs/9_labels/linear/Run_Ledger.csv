@@ -1,0 +1,4 @@
+Database_file	Epochs	LR	Batch_Size	Final_accu	Optimzer	Test Accuracy	Embed Size	Vocabulary Size
+../../../data/9_labels/linear/full	20	5	32	0.175817396668723	Adagrad	0.533162648899034
+../../../data/9_labels/linear/full	20	5	32	0.1765371170059634	Adagrad	0.5242274215854116
+../../../data/9_labels/linear/full	20	5	32	0.18651038453629445	Adagrad	0.5294404943679277	64	100124
